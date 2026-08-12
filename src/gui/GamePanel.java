@@ -24,7 +24,11 @@ public class GamePanel extends JPanel {
 
     private Timer guiTimer;
 
-    public GamePanel() {
+    private JFrame frame;
+
+    public GamePanel(JFrame frame) {
+
+        this.frame = frame;
 
         gameManager = new GameManager(4);
         gameTimer = new GameTimer();
@@ -43,9 +47,11 @@ public class GamePanel extends JPanel {
         );
 
         movesLabel = new JLabel("Moves: 0");
+
         timerLabel = new JLabel("Time: 00:00");
 
-        JPanel topPanel = new JPanel(new BorderLayout());
+        JPanel topPanel =
+                new JPanel(new BorderLayout());
 
         topPanel.add(
                 timerLabel,
@@ -67,17 +73,26 @@ public class GamePanel extends JPanel {
                 BorderLayout.NORTH
         );
 
-        cardPanel = new JPanel(
-                new GridLayout(2, 4, 10, 10)
-        );
+        cardPanel =
+                new JPanel(
+                        new GridLayout(
+                                2,
+                                4,
+                                10,
+                                10
+                        )
+                );
 
         cardButtons = new JButton[8];
 
-        for (int i = 0; i < cardButtons.length; i++) {
+        for (int i = 0;
+             i < cardButtons.length;
+             i++) {
 
             final int index = i;
 
-            cardButtons[i] = new JButton("?");
+            cardButtons[i] =
+                    new JButton("?");
 
             cardButtons[i].setFont(
                     new Font(
@@ -108,10 +123,11 @@ public class GamePanel extends JPanel {
 
         gameTimer.start();
 
-        guiTimer = new Timer(
-                200,
-                e -> updateTimerLabel()
-        );
+        guiTimer =
+                new Timer(
+                        200,
+                        e -> updateTimerLabel()
+                );
 
         guiTimer.start();
     }
@@ -175,18 +191,21 @@ public class GamePanel extends JPanel {
 
             cardsLocked = true;
 
-            Timer timer = new Timer(
-                    700,
-                    e -> {
+            Timer timer =
+                    new Timer(
+                            700,
+                            e -> {
 
-                        gameManager
-                                .resetUnmatchedCards();
+                                gameManager
+                                        .resetUnmatchedCards();
 
-                        updateCards();
+                                updateCards();
 
-                        cardsLocked = false;
-                    }
-            );
+                                cardsLocked = false;
+
+                                checkGameComplete();
+                            }
+                    );
 
             timer.setRepeats(false);
             timer.start();
@@ -217,6 +236,34 @@ public class GamePanel extends JPanel {
                 cardButtons[i].setText("?");
 
             }
+        }
+    }
+
+    private void checkGameComplete() {
+
+        if (gameManager.isGameComplete()) {
+
+            gameTimer.stop();
+
+            if (guiTimer != null) {
+                guiTimer.stop();
+            }
+
+            int finalTime =
+                    gameTimer.getSeconds();
+
+            int finalMoves =
+                    gameManager.getMoves();
+
+            frame.setContentPane(
+                    new ResultPanel(
+                            finalTime,
+                            finalMoves
+                    )
+            );
+
+            frame.revalidate();
+            frame.repaint();
         }
     }
 }

@@ -8,10 +8,6 @@ public class Main {
         JFrame frame =
                 new JFrame("Memory Match Mania");
 
-        frame.setContentPane(
-                new GamePanel()
-        );
-
         frame.setSize(
                 800,
                 600
@@ -22,6 +18,10 @@ public class Main {
         );
 
         frame.setLocationRelativeTo(null);
+
+        frame.setContentPane(
+                new GamePanel(frame)
+        );
 
         frame.setVisible(true);
     }

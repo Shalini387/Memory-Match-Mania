@@ -1,7 +1,6 @@
 package gui;
 
 import game.Card;
-import game.GameBoard;
 import game.GameManager;
 
 import javax.swing.*;
@@ -19,9 +18,12 @@ public class GamePanel extends JPanel {
 
     private JButton[] cardButtons;
 
+    private boolean cardsLocked;
+
     public GamePanel() {
 
         gameManager = new GameManager(4);
+        cardsLocked = false;
 
         setLayout(new BorderLayout());
 
@@ -53,7 +55,9 @@ public class GamePanel extends JPanel {
                     new Font("Arial", Font.BOLD, 24)
             );
 
-            cardButtons[i].addActionListener(e -> handleCardClick(index));
+            cardButtons[i].addActionListener(
+                    e -> handleCardClick(index)
+            );
 
             cardPanel.add(cardButtons[i]);
         }
@@ -63,12 +67,25 @@ public class GamePanel extends JPanel {
 
     private void handleCardClick(int index) {
 
-        boolean result = gameManager.selectCard(index);
+        if (cardsLocked) {
+            return;
+        }
 
         Card selectedCard =
                 gameManager.getBoard().getCards().get(index);
 
-        cardButtons[index].setText(selectedCard.getValue());
+        if (selectedCard.isFaceUp() || selectedCard.isMatched()) {
+            return;
+        }
+
+        boolean result = gameManager.selectCard(index);
+
+        selectedCard =
+                gameManager.getBoard().getCards().get(index);
+
+        cardButtons[index].setText(
+                selectedCard.getValue()
+        );
 
         movesLabel.setText(
                 "Moves: " + gameManager.getMoves()
@@ -76,11 +93,15 @@ public class GamePanel extends JPanel {
 
         if (gameManager.getMoves() > 0) {
 
+            cardsLocked = true;
+
             Timer timer = new Timer(700, e -> {
 
                 gameManager.resetUnmatchedCards();
 
                 updateCards();
+
+                cardsLocked = false;
 
             });
 
@@ -97,9 +118,15 @@ public class GamePanel extends JPanel {
                     gameManager.getBoard().getCards().get(i);
 
             if (card.isFaceUp() || card.isMatched()) {
-                cardButtons[i].setText(card.getValue());
+
+                cardButtons[i].setText(
+                        card.getValue()
+                );
+
             } else {
+
                 cardButtons[i].setText("?");
+
             }
         }
     }

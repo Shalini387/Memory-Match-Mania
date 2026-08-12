@@ -1,25 +1,20 @@
-import game.GameManager;
+import javax.swing.JFrame;
+import gui.GamePanel;
 
 public class Main {
 
     public static void main(String[] args) {
 
-        GameManager game = new GameManager(4);
+        JFrame frame = new JFrame("Memory Match Mania");
 
-        System.out.println("Number of cards: "
-                + game.getBoard().getCards().size());
+        frame.setContentPane(new GamePanel());
 
-        System.out.println("Moves: " + game.getMoves());
+        frame.setSize(800, 600);
 
-        game.selectCard(0);
-        game.selectCard(1);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        System.out.println("Moves after selecting two cards: "
-                + game.getMoves());
+        frame.setLocationRelativeTo(null);
 
-        game.resetUnmatchedCards();
-
-        System.out.println("Game complete: "
-                + game.isGameComplete());
+        frame.setVisible(true);
     }
 }

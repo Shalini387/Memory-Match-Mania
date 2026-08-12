@@ -1,6 +1,7 @@
 package gui;
 
 import game.Card;
+import game.Difficulty;
 import game.GameManager;
 import game.GameTimer;
 
@@ -26,28 +27,30 @@ public class GamePanel extends JPanel {
 
     private JFrame frame;
 
-    public GamePanel(JFrame frame) {
+    private Difficulty difficulty;
+
+    public GamePanel(JFrame frame, Difficulty difficulty) {
 
         this.frame = frame;
+        this.difficulty = difficulty;
 
-        gameManager = new GameManager(4);
+        gameManager = new GameManager(difficulty);
         gameTimer = new GameTimer();
 
         cardsLocked = false;
 
-        setLayout(new BorderLayout());
+        setLayout(new BorderLayout(10, 10));
 
         titleLabel = new JLabel(
-                "MEMORY MATCH MANIA",
+                "MEMORY MATCH MANIA - " + difficulty,
                 SwingConstants.CENTER
         );
 
         titleLabel.setFont(
-                new Font("Arial", Font.BOLD, 28)
+                new Font("Arial", Font.BOLD, 24)
         );
 
         movesLabel = new JLabel("Moves: 0");
-
         timerLabel = new JLabel("Time: 00:00");
 
         JPanel topPanel =
@@ -73,17 +76,20 @@ public class GamePanel extends JPanel {
                 BorderLayout.NORTH
         );
 
-        cardPanel =
-                new JPanel(
-                        new GridLayout(
-                                2,
-                                4,
-                                10,
-                                10
-                        )
-                );
+        cardPanel = new JPanel(
+                new GridLayout(
+                        difficulty.getRows(),
+                        difficulty.getColumns(),
+                        12,
+                        12
+                )
+        );
 
-        cardButtons = new JButton[8];
+        int numberOfCards =
+                difficulty.getNumberOfPairs() * 2;
+
+        cardButtons =
+                new JButton[numberOfCards];
 
         for (int i = 0;
              i < cardButtons.length;
@@ -98,9 +104,15 @@ public class GamePanel extends JPanel {
                     new Font(
                             "Arial",
                             Font.BOLD,
-                            24
+                            30
                     )
             );
+
+            cardButtons[i].setPreferredSize(
+                    new Dimension(100, 80)
+            );
+
+            cardButtons[i].setFocusPainted(false);
 
             cardButtons[i].addActionListener(
                     e -> handleCardClick(index)
@@ -123,11 +135,10 @@ public class GamePanel extends JPanel {
 
         gameTimer.start();
 
-        guiTimer =
-                new Timer(
-                        200,
-                        e -> updateTimerLabel()
-                );
+        guiTimer = new Timer(
+                200,
+                e -> updateTimerLabel()
+        );
 
         guiTimer.start();
     }
@@ -257,8 +268,10 @@ public class GamePanel extends JPanel {
 
             frame.setContentPane(
                     new ResultPanel(
+                            frame,
                             finalTime,
-                            finalMoves
+                            finalMoves,
+                            difficulty
                     )
             );
 

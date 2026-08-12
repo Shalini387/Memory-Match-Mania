@@ -1,12 +1,14 @@
 import javax.swing.JFrame;
-import gui.GamePanel;
+import gui.HomePanel;
 
 public class Main {
 
     public static void main(String[] args) {
 
         JFrame frame =
-                new JFrame("Memory Match Mania");
+                new JFrame(
+                        "Memory Match Mania"
+                );
 
         frame.setSize(
                 800,
@@ -20,7 +22,7 @@ public class Main {
         frame.setLocationRelativeTo(null);
 
         frame.setContentPane(
-                new GamePanel(frame)
+                new HomePanel(frame)
         );
 
         frame.setVisible(true);

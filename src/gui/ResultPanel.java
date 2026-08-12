@@ -1,5 +1,7 @@
 package gui;
 
+import game.Difficulty;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -12,51 +14,89 @@ public class ResultPanel extends JPanel {
     private JButton playAgainButton;
     private JButton homeButton;
 
-    public ResultPanel(int seconds, int moves) {
+    private JFrame frame;
+    private Difficulty difficulty;
 
-        setLayout(new BorderLayout(20, 20));
+    public ResultPanel(
+            JFrame frame,
+            int seconds,
+            int moves,
+            Difficulty difficulty) {
 
-        titleLabel = new JLabel(
-                "🎉 YOU WON!",
-                SwingConstants.CENTER
+        this.frame = frame;
+        this.difficulty = difficulty;
+
+        setLayout(
+                new BorderLayout(
+                        20,
+                        20
+                )
         );
 
+        titleLabel =
+                new JLabel(
+                        "YOU WON!",
+                        SwingConstants.CENTER
+                );
+
         titleLabel.setFont(
-                new Font("Arial", Font.BOLD, 36)
+                new Font(
+                        "Arial",
+                        Font.BOLD,
+                        36
+                )
         );
 
         int minutes = seconds / 60;
         int remainingSeconds = seconds % 60;
 
-        timeLabel = new JLabel(
-                String.format(
-                        "Time: %02d:%02d",
-                        minutes,
-                        remainingSeconds
-                ),
-                SwingConstants.CENTER
-        );
+        timeLabel =
+                new JLabel(
+                        String.format(
+                                "Time: %02d:%02d",
+                                minutes,
+                                remainingSeconds
+                        ),
+                        SwingConstants.CENTER
+                );
 
-        movesLabel = new JLabel(
-                "Moves: " + moves,
-                SwingConstants.CENTER
-        );
+        movesLabel =
+                new JLabel(
+                        "Moves: " + moves,
+                        SwingConstants.CENTER
+                );
 
         timeLabel.setFont(
-                new Font("Arial", Font.BOLD, 22)
+                new Font(
+                        "Arial",
+                        Font.BOLD,
+                        22
+                )
         );
 
         movesLabel.setFont(
-                new Font("Arial", Font.BOLD, 22)
+                new Font(
+                        "Arial",
+                        Font.BOLD,
+                        22
+                )
         );
 
         JPanel resultInfoPanel =
-                new JPanel(new GridLayout(2, 1, 10, 10));
+                new JPanel(
+                        new GridLayout(
+                                2,
+                                1,
+                                10,
+                                10
+                        )
+                );
 
         resultInfoPanel.add(timeLabel);
         resultInfoPanel.add(movesLabel);
 
-        JPanel buttonPanel = new JPanel();
+        JPanel buttonPanel =
+                new JPanel();
 
         playAgainButton =
                 new JButton("PLAY AGAIN");
@@ -64,8 +104,21 @@ public class ResultPanel extends JPanel {
         homeButton =
                 new JButton("HOME");
 
-        buttonPanel.add(playAgainButton);
-        buttonPanel.add(homeButton);
+        playAgainButton.addActionListener(
+                e -> playAgain()
+        );
+
+        homeButton.addActionListener(
+                e -> goHome()
+        );
+
+        buttonPanel.add(
+                playAgainButton
+        );
+
+        buttonPanel.add(
+                homeButton
+        );
 
         add(
                 titleLabel,
@@ -81,5 +134,28 @@ public class ResultPanel extends JPanel {
                 buttonPanel,
                 BorderLayout.SOUTH
         );
+    }
+
+    private void playAgain() {
+
+        frame.setContentPane(
+                new GamePanel(
+                        frame,
+                        difficulty
+                )
+        );
+
+        frame.revalidate();
+        frame.repaint();
+    }
+
+    private void goHome() {
+
+        frame.setContentPane(
+                new HomePanel(frame)
+        );
+
+        frame.revalidate();
+        frame.repaint();
     }
 }

@@ -6,45 +6,66 @@ public class GameManager {
     private Card firstCard;
     private Card secondCard;
     private int moves;
+    private Difficulty difficulty;
 
-    public GameManager(int numberOfPairs) {
-        board = new GameBoard(numberOfPairs);
+    public GameManager(Difficulty difficulty) {
+
+        this.difficulty = difficulty;
+
+        board = new GameBoard(
+                difficulty.getNumberOfPairs()
+        );
+
         moves = 0;
     }
 
     public boolean selectCard(int index) {
 
-        if (index < 0 || index >= board.getCards().size()) {
+        if (index < 0 ||
+                index >= board.getCards().size()) {
+
             return false;
         }
 
-        Card selectedCard = board.getCards().get(index);
+        Card selectedCard =
+                board.getCards().get(index);
 
-        if (selectedCard.isMatched() || selectedCard.isFaceUp()) {
+        if (selectedCard.isMatched()
+                || selectedCard.isFaceUp()) {
+
             return false;
         }
 
         selectedCard.setFaceUp(true);
 
         if (firstCard == null) {
+
             firstCard = selectedCard;
+
             return true;
         }
 
         secondCard = selectedCard;
+
         moves++;
 
-        return firstCard.getValue().equals(secondCard.getValue());
+        return firstCard.getValue()
+                .equals(secondCard.getValue());
     }
 
     public void resetUnmatchedCards() {
 
-        if (firstCard != null && secondCard != null) {
+        if (firstCard != null
+                && secondCard != null) {
 
-            if (!firstCard.getValue().equals(secondCard.getValue())) {
+            if (!firstCard.getValue()
+                    .equals(secondCard.getValue())) {
+
                 firstCard.setFaceUp(false);
                 secondCard.setFaceUp(false);
+
             } else {
+
                 firstCard.setMatched(true);
                 secondCard.setMatched(true);
             }
@@ -61,6 +82,7 @@ public class GameManager {
     public boolean isGameComplete() {
 
         for (Card card : board.getCards()) {
+
             if (!card.isMatched()) {
                 return false;
             }
@@ -71,5 +93,9 @@ public class GameManager {
 
     public GameBoard getBoard() {
         return board;
+    }
+
+    public Difficulty getDifficulty() {
+        return difficulty;
     }
 }

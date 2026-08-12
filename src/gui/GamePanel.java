@@ -2,6 +2,7 @@ package gui;
 
 import game.Card;
 import game.GameManager;
+import game.GameTimer;
 
 import javax.swing.*;
 import java.awt.*;
@@ -15,33 +16,60 @@ public class GamePanel extends JPanel {
     private JPanel cardPanel;
 
     private GameManager gameManager;
+    private GameTimer gameTimer;
 
     private JButton[] cardButtons;
 
     private boolean cardsLocked;
 
+    private Timer guiTimer;
+
     public GamePanel() {
 
         gameManager = new GameManager(4);
+        gameTimer = new GameTimer();
+
         cardsLocked = false;
 
         setLayout(new BorderLayout());
 
-        titleLabel = new JLabel("MEMORY MATCH MANIA", SwingConstants.CENTER);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 28));
+        titleLabel = new JLabel(
+                "MEMORY MATCH MANIA",
+                SwingConstants.CENTER
+        );
+
+        titleLabel.setFont(
+                new Font("Arial", Font.BOLD, 28)
+        );
 
         movesLabel = new JLabel("Moves: 0");
         timerLabel = new JLabel("Time: 00:00");
 
         JPanel topPanel = new JPanel(new BorderLayout());
 
-        topPanel.add(timerLabel, BorderLayout.WEST);
-        topPanel.add(titleLabel, BorderLayout.CENTER);
-        topPanel.add(movesLabel, BorderLayout.EAST);
+        topPanel.add(
+                timerLabel,
+                BorderLayout.WEST
+        );
 
-        add(topPanel, BorderLayout.NORTH);
+        topPanel.add(
+                titleLabel,
+                BorderLayout.CENTER
+        );
 
-        cardPanel = new JPanel(new GridLayout(2, 4, 10, 10));
+        topPanel.add(
+                movesLabel,
+                BorderLayout.EAST
+        );
+
+        add(
+                topPanel,
+                BorderLayout.NORTH
+        );
+
+        cardPanel = new JPanel(
+                new GridLayout(2, 4, 10, 10)
+        );
 
         cardButtons = new JButton[8];
 
@@ -52,17 +80,60 @@ public class GamePanel extends JPanel {
             cardButtons[i] = new JButton("?");
 
             cardButtons[i].setFont(
-                    new Font("Arial", Font.BOLD, 24)
+                    new Font(
+                            "Arial",
+                            Font.BOLD,
+                            24
+                    )
             );
 
             cardButtons[i].addActionListener(
                     e -> handleCardClick(index)
             );
 
-            cardPanel.add(cardButtons[i]);
+            cardPanel.add(
+                    cardButtons[i]
+            );
         }
 
-        add(cardPanel, BorderLayout.CENTER);
+        add(
+                cardPanel,
+                BorderLayout.CENTER
+        );
+
+        startTimer();
+    }
+
+    private void startTimer() {
+
+        gameTimer.start();
+
+        guiTimer = new Timer(
+                200,
+                e -> updateTimerLabel()
+        );
+
+        guiTimer.start();
+    }
+
+    private void updateTimerLabel() {
+
+        int seconds =
+                gameTimer.getSeconds();
+
+        int minutes =
+                seconds / 60;
+
+        int remainingSeconds =
+                seconds % 60;
+
+        timerLabel.setText(
+                String.format(
+                        "Time: %02d:%02d",
+                        minutes,
+                        remainingSeconds
+                )
+        );
     }
 
     private void handleCardClick(int index) {
@@ -72,38 +143,50 @@ public class GamePanel extends JPanel {
         }
 
         Card selectedCard =
-                gameManager.getBoard().getCards().get(index);
+                gameManager
+                        .getBoard()
+                        .getCards()
+                        .get(index);
 
-        if (selectedCard.isFaceUp() || selectedCard.isMatched()) {
+        if (selectedCard.isFaceUp()
+                || selectedCard.isMatched()) {
+
             return;
         }
 
-        boolean result = gameManager.selectCard(index);
+        gameManager.selectCard(index);
 
         selectedCard =
-                gameManager.getBoard().getCards().get(index);
+                gameManager
+                        .getBoard()
+                        .getCards()
+                        .get(index);
 
         cardButtons[index].setText(
                 selectedCard.getValue()
         );
 
         movesLabel.setText(
-                "Moves: " + gameManager.getMoves()
+                "Moves: "
+                        + gameManager.getMoves()
         );
 
         if (gameManager.getMoves() > 0) {
 
             cardsLocked = true;
 
-            Timer timer = new Timer(700, e -> {
+            Timer timer = new Timer(
+                    700,
+                    e -> {
 
-                gameManager.resetUnmatchedCards();
+                        gameManager
+                                .resetUnmatchedCards();
 
-                updateCards();
+                        updateCards();
 
-                cardsLocked = false;
-
-            });
+                        cardsLocked = false;
+                    }
+            );
 
             timer.setRepeats(false);
             timer.start();
@@ -112,12 +195,18 @@ public class GamePanel extends JPanel {
 
     private void updateCards() {
 
-        for (int i = 0; i < cardButtons.length; i++) {
+        for (int i = 0;
+             i < cardButtons.length;
+             i++) {
 
             Card card =
-                    gameManager.getBoard().getCards().get(i);
+                    gameManager
+                            .getBoard()
+                            .getCards()
+                            .get(i);
 
-            if (card.isFaceUp() || card.isMatched()) {
+            if (card.isFaceUp()
+                    || card.isMatched()) {
 
                 cardButtons[i].setText(
                         card.getValue()

@@ -2,6 +2,7 @@ package gui;
 
 import game.Card;
 import game.GameBoard;
+import game.GameManager;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,11 +14,14 @@ public class GamePanel extends JPanel {
     private JLabel timerLabel;
 
     private JPanel cardPanel;
-    private GameBoard board;
+
+    private GameManager gameManager;
+
+    private JButton[] cardButtons;
 
     public GamePanel() {
 
-        board = new GameBoard(4);
+        gameManager = new GameManager(4);
 
         setLayout(new BorderLayout());
 
@@ -28,6 +32,7 @@ public class GamePanel extends JPanel {
         timerLabel = new JLabel("Time: 00:00");
 
         JPanel topPanel = new JPanel(new BorderLayout());
+
         topPanel.add(timerLabel, BorderLayout.WEST);
         topPanel.add(titleLabel, BorderLayout.CENTER);
         topPanel.add(movesLabel, BorderLayout.EAST);
@@ -36,15 +41,66 @@ public class GamePanel extends JPanel {
 
         cardPanel = new JPanel(new GridLayout(2, 4, 10, 10));
 
-        for (Card card : board.getCards()) {
+        cardButtons = new JButton[8];
 
-            JButton cardButton = new JButton("?");
+        for (int i = 0; i < cardButtons.length; i++) {
 
-            cardButton.setFont(new Font("Arial", Font.BOLD, 24));
+            final int index = i;
 
-            cardPanel.add(cardButton);
+            cardButtons[i] = new JButton("?");
+
+            cardButtons[i].setFont(
+                    new Font("Arial", Font.BOLD, 24)
+            );
+
+            cardButtons[i].addActionListener(e -> handleCardClick(index));
+
+            cardPanel.add(cardButtons[i]);
         }
 
         add(cardPanel, BorderLayout.CENTER);
+    }
+
+    private void handleCardClick(int index) {
+
+        boolean result = gameManager.selectCard(index);
+
+        Card selectedCard =
+                gameManager.getBoard().getCards().get(index);
+
+        cardButtons[index].setText(selectedCard.getValue());
+
+        movesLabel.setText(
+                "Moves: " + gameManager.getMoves()
+        );
+
+        if (gameManager.getMoves() > 0) {
+
+            Timer timer = new Timer(700, e -> {
+
+                gameManager.resetUnmatchedCards();
+
+                updateCards();
+
+            });
+
+            timer.setRepeats(false);
+            timer.start();
+        }
+    }
+
+    private void updateCards() {
+
+        for (int i = 0; i < cardButtons.length; i++) {
+
+            Card card =
+                    gameManager.getBoard().getCards().get(i);
+
+            if (card.isFaceUp() || card.isMatched()) {
+                cardButtons[i].setText(card.getValue());
+            } else {
+                cardButtons[i].setText("?");
+            }
+        }
     }
 }
